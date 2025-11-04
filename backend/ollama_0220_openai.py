@@ -1,7 +1,6 @@
 from openai import OpenAI
 from GeneratorModel import GeneratorModel
 import argparse
-import torch
 import pickle
 #from em_retriever import *
 import json
@@ -1121,12 +1120,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure device
-    if args.use_mps and torch.backends.mps.is_available():
-        device = "mps"
-        print("Using MPS backend for inference.")
-    else:
-        device = "cpu"
-        print("Using CPU backend for inference.")
+    # if args.use_mps and torch.backends.mps.is_available():
+    #     device = "mps"
+    #     print("Using MPS backend for inference.")
+    # else:
+    #     device = "cpu"
+    #     print("Using CPU backend for inference.")
 
 
     # Generate and save answers
