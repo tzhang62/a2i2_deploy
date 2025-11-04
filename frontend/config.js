@@ -8,7 +8,9 @@
 // const API_BASE_URL = 'https://your-app-name.onrender.com';
 //
 // Current configuration:
-const API_BASE_URL = 'http://localhost:8001'; 
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8001'  // Local development
+    : 'https://a2i2-deploy.onrender.com';
 
 // Export for use in other files
 window.API_CONFIG = {
