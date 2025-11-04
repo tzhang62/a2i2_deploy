@@ -4,8 +4,6 @@ import argparse
 import pickle
 #from em_retriever import *
 import json
-from sentence_transformers import SentenceTransformer
-import faiss
 import numpy as np
 import os
 from typing import List, Dict, Optional
@@ -100,9 +98,7 @@ class DialogueVectorStore:
         self.operator_responses = {}
         self.operator_response_categories = ['greetings', 'progression', 'observations', 'closing', 'emphasize_danger', 'emphasize_value_of_life', 'give_up_persuading']
         self.character_response_categories = ['greetings', 'response_to_operator_greetings', 'progression', 'observations', 'general', 'closing']
-        # Initialize sentence transformer for semantic similarity
-        self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
-        
+      
     def add_dialogues(self, file_path):
         """Load character responses from JSONL file."""
         try:
