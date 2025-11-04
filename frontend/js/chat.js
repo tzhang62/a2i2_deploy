@@ -11,7 +11,8 @@ const retrievedInfo = document.getElementById('retrieved-info');
 const retrievedContent = document.getElementById('retrieved-content');
 
 // API Configuration - loaded from config.js
-const API_BASE_URL = window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'http://localhost:8001';
+// Get API URL from config.js (window.API_CONFIG.BASE_URL)
+const API_URL = window.API_CONFIG?.BASE_URL || 'http://localhost:8001';
 
 // Get selected person from session storage
 const selectedPerson = sessionStorage.getItem('selectedPerson');
@@ -21,7 +22,7 @@ const personaData = JSON.parse(sessionStorage.getItem('personaData'));
 console.log('=== Chat Page Initialized ===');
 console.log('selectedPerson from sessionStorage:', selectedPerson);
 console.log('personaData from sessionStorage:', personaData);
-console.log('API_BASE_URL:', API_BASE_URL);
+console.log('API_BASE_URL:', API_URL);
 
 // Check if person was selected
 if (!selectedPerson) {
@@ -156,7 +157,7 @@ async function generateJulieResponse() {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/chat`, {
+        const response = await fetch(`${API_URL}/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -235,7 +236,7 @@ function toggleSpeaker() {
 // Add error handling for backend connection
 async function checkBackendConnection() {
     try {
-        const response = await fetch(`${API_BASE_URL}/persona/bob`);
+        const response = await fetch(`${API_URL}/persona/bob`);
         if (!response.ok) {
             throw new Error('Backend connection failed');
         }
@@ -403,7 +404,7 @@ async function sendMessage() {
     let data;
     try {
         console.log(`Sending message as ${speaker}: ${userInput}`);
-        const response = await fetch(`${API_BASE_URL}/chat`, {
+        const response = await fetch(`${API_URL}/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -508,7 +509,7 @@ async function sendMessage() {
 async function generateAutoChat() {
     console.log('=== Auto Mode Started ===');
     console.log('selectedPerson:', selectedPerson);
-    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('API_BASE_URL:', API_URL);
     
     try {
         const townPerson = selectedPerson;  // Use selectedPerson from session storage
@@ -538,10 +539,10 @@ async function generateAutoChat() {
 
         try {
             console.log('Generating complete conversation');
-            console.log('Sending request to:', `${API_BASE_URL}/chat`);
+            console.log('Sending request to:', `${API_URL}/chat`);
             console.log('Request body:', { townPerson: townPerson, mode: 'auto' });
             
-            const response = await fetch(`${API_BASE_URL}/chat`, {
+            const response = await fetch(`${API_URL}/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
