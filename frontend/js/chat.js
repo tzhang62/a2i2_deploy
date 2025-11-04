@@ -17,8 +17,27 @@ const API_BASE_URL = window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'http://lo
 const selectedPerson = sessionStorage.getItem('selectedPerson');
 const personaData = JSON.parse(sessionStorage.getItem('personaData'));
 
-// Update chat title
-document.getElementById('chat-title').textContent = `Chat with ${selectedPerson} as Emergency Operator`;
+// Debug: Log what we got from session storage
+console.log('=== Chat Page Initialized ===');
+console.log('selectedPerson from sessionStorage:', selectedPerson);
+console.log('personaData from sessionStorage:', personaData);
+console.log('API_BASE_URL:', API_BASE_URL);
+
+// Check if person was selected
+if (!selectedPerson) {
+    console.error('ERROR: No person selected! Redirecting to index...');
+    alert('Please select a town person first!');
+    // Use a small delay to ensure the alert is shown
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 100);
+} else {
+    // Update chat title only if person is selected
+    const chatTitleElement = document.getElementById('chat-title');
+    if (chatTitleElement) {
+        chatTitleElement.textContent = `Chat with ${selectedPerson} as Emergency Operator`;
+    }
+}
 
 let isAutoMode = false;
 let useJulie = false; // Flag to determine if Julie should interact
@@ -487,12 +506,18 @@ async function sendMessage() {
 
 // Function to handle auto mode chat generation
 async function generateAutoChat() {
+    console.log('=== Auto Mode Started ===');
+    console.log('selectedPerson:', selectedPerson);
+    console.log('API_BASE_URL:', API_BASE_URL);
+    
     try {
         const townPerson = selectedPerson;  // Use selectedPerson from session storage
         if (!townPerson) {
+            console.error('No town person selected!');
             alert('Please select a town person first.');
             return;
         }
+        console.log('Town person confirmed:', townPerson);
 
         // Clear previous chat
         chatWindow.innerHTML = '';
@@ -513,6 +538,9 @@ async function generateAutoChat() {
 
         try {
             console.log('Generating complete conversation');
+            console.log('Sending request to:', `${API_BASE_URL}/chat`);
+            console.log('Request body:', { townPerson: townPerson, mode: 'auto' });
+            
             const response = await fetch(`${API_BASE_URL}/chat`, {
                 method: 'POST',
                 headers: {
@@ -524,8 +552,13 @@ async function generateAutoChat() {
                 })
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
             }
             
             const data = await response.json();
@@ -578,12 +611,17 @@ async function generateAutoChat() {
             sendBtn.disabled = false;
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('=== Auto Mode Error ===');
+            console.error('Error details:', error);
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
+            
             // Clear any existing messages
             chatWindow.innerHTML = '';
             resetLineCounter();
             
             addMessage('Error generating conversation: ' + error.message, 'System');
+            addMessage('Check browser console (F12) for more details.', 'System');
             
             // Re-enable controls on error
             autoModeBtn.disabled = false;
@@ -683,19 +721,55 @@ async function restartConversation() {
     }
 }
 
-// Event listeners
-interactiveModeBtn.addEventListener('click', enableInteractiveMode);
-autoModeBtn.addEventListener('click', enableAutoMode);
-restartBtn.addEventListener('click', restartConversation);
-sendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
-speakerToggleBtn.addEventListener('click', toggleSpeaker);
+// Event listeners - with safety checks
+console.log('=== Setting up event listeners ===');
+console.log('interactiveModeBtn:', interactiveModeBtn);
+console.log('autoModeBtn:', autoModeBtn);
+console.log('restartBtn:', restartBtn);
+console.log('sendBtn:', sendBtn);
+console.log('chatInput:', chatInput);
+console.log('speakerToggleBtn:', speakerToggleBtn);
+
+if (interactiveModeBtn) {
+    interactiveModeBtn.addEventListener('click', () => {
+        console.log('Interactive mode button clicked');
+        enableInteractiveMode();
+    });
+} else {
+    console.error('Interactive mode button not found!');
+}
+
+if (autoModeBtn) {
+    autoModeBtn.addEventListener('click', () => {
+        console.log('Auto mode button clicked');
+        enableAutoMode();
+    });
+} else {
+    console.error('Auto mode button not found!');
+}
+
+if (restartBtn) {
+    restartBtn.addEventListener('click', restartConversation);
+}
+
+if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+}
+
+if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+if (speakerToggleBtn) {
+    speakerToggleBtn.addEventListener('click', toggleSpeaker);
+}
 
 // Start in interactive mode by default
+console.log('Starting in interactive mode...');
 enableInteractiveMode();
 
 // Function to update the decision status display
