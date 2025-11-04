@@ -101,6 +101,7 @@ class ChatRequest(BaseModel):
     mode: str  # "interactive" or "auto"
 
 @app.get("/")
+@app.head("/")
 async def root():
     """Health check endpoint"""
     return {"status": "ok", "message": "Emergency Response Chatbot Backend is running"}
