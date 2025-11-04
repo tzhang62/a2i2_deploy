@@ -22,12 +22,14 @@ app.add_middleware(
 )
 
 # Add security headers middleware
+# Allow Render domains and localhost
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=[
         "localhost",
-        #"*.onrender.com",  # Allow all Render.com subdomains
-        #"emergency-chatbot-backend.onrender.com"  # Your specific Render domain
+        "*.onrender.com",  # Allow all Render.com subdomains
+        "a2i2-deploy.onrender.com",  # Your specific Render domain
+        "*"  # Allow all hosts for now (remove in production for better security)
     ]
 )
 
