@@ -692,13 +692,25 @@ async function restartConversation() {
     speakerToggleBtn.textContent = `Switch to ${selectedPerson}`;
     chatInput.placeholder = 'Type Operator\'s message...';
     
-    // Clear backend conversation history (if needed)
+    // Clear backend conversation history
     try {
-        // You can add an API call here to clear backend session if implemented
-        // For now, the backend will handle new session on next message
-        console.log('Frontend state cleared');
+        console.log('Clearing backend conversation history...');
+        const response = await fetch(`${API_URL}/clear-session/${selectedPerson}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Backend session cleared:', data.message);
+        } else {
+            console.warn('Failed to clear backend session, but continuing anyway');
+        }
     } catch (error) {
         console.error('Error clearing backend session:', error);
+        console.log('Continuing with restart despite error');
     }
     
     // Restart based on current mode

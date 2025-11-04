@@ -13,26 +13,21 @@ import time
 app = FastAPI()
 
 # Enable CORS with proper configuration for production
-# TODO: After deployment, replace "*" with your actual Netlify URL
-# Example: allow_origins=["https://your-app.netlify.app", "http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # IMPORTANT: Update this with your Netlify URL after deployment
+    allow_origins=["*"],  # In production, replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Add security headers middleware
-# TODO: After deployment, add your actual Render and Netlify domains
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=[
         "localhost",
-        "*.onrender.com",  # Allow all Render.com subdomains
-        # Add your specific domains after deployment:
-        # "your-app.onrender.com",
-        # "your-app.netlify.app"
+        #"*.onrender.com",  # Allow all Render.com subdomains
+        #"emergency-chatbot-backend.onrender.com"  # Your specific Render domain
     ]
 )
 
@@ -127,6 +122,24 @@ async def get_persona(town_person: str):
     except Exception as e:
         import pdb; pdb.set_trace()
         print(f"Error in get_persona: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/clear-session/{town_person}")
+async def clear_session(town_person: str):
+    """Clear conversation history for a specific town person."""
+    try:
+        town_person_lower = town_person.lower()
+        session_id = f"{town_person_lower}_session"
+        
+        # Clear the conversation history
+        cleared = conversation_manager.clear_session(session_id)
+        
+        if cleared:
+            return {"status": "ok", "message": f"Conversation history cleared for {town_person}"}
+        else:
+            return {"status": "ok", "message": f"No conversation history found for {town_person}"}
+    except Exception as e:
+        print(f"Error in clear_session: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat")

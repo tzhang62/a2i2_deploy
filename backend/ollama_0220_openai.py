@@ -253,6 +253,16 @@ class ConversationManager:
             print(f"Message {i+1}: {msg['speaker']}: {msg['content']}")
         
         return "\n".join([f"{msg['speaker']}: {msg['content']}" for msg in history])
+    
+    def clear_session(self, session_id: str):
+        """Clear conversation history for a specific session."""
+        if session_id in self.conversations:
+            del self.conversations[session_id]
+            print(f"Cleared conversation history for session ID: {session_id}")
+            return True
+        else:
+            print(f"No conversation found for session ID: {session_id}")
+            return False
 
 # Initialize global instances
 vector_store = DialogueVectorStore()
